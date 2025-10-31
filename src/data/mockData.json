@@ -1,0 +1,120 @@
+{
+  "departments": ["IPRD", "Education", "Tourism", "Health"],
+  "districts": ["Patna", "Nalanda", "Gaya"],
+  "blocks": ["Block A", "Block B", "Block C"],
+  "roles": ["Super Admin", "Dept Admin", "District Officer", "Block Officer", "Staff", "Viewer"],
+  "videos": [
+    {
+      "id": 1,
+      "title": "CM Patna Visit",
+      "department": "IPRD",
+      "district": "Patna",
+      "block": "Block A",
+      "personTag": "CM",
+      "contentType": "Video",
+      "status": "Final",
+      "tags": [
+        {"start": "00:10:00", "end": "00:11:30", "type": "CM Byte", "remarks": "Speech Section"},
+        {"start": "00:20:00", "end": "00:25:00", "type": "Innovation", "remarks": "Project Launch"}
+      ],
+      "source": "cloud",
+      "uploadDate": "2025-01-15"
+    },
+    {
+      "id": 2,
+      "title": "District Achievement Report",
+      "department": "Education",
+      "district": "Nalanda",
+      "block": "Block B",
+      "personTag": "District Officer",
+      "contentType": "Document",
+      "status": "Raw",
+      "tags": [],
+      "source": "local",
+      "uploadDate": "2025-01-14"
+    },
+    {
+      "id": 3,
+      "title": "Tourism Promotion Video",
+      "department": "Tourism",
+      "district": "Gaya",
+      "block": "Block C",
+      "personTag": "Tourism Officer",
+      "contentType": "Video",
+      "status": "Raw",
+      "tags": [],
+      "source": "cloud",
+      "uploadDate": "2025-01-13"
+    }
+  ],
+  "shares": [
+    {
+      "id": 1,
+      "to": "raj@bihar.gov.in",
+      "file": "CM Patna Visit",
+      "tag": "CM Byte",
+      "date": "2025-10-31",
+      "department": "IPRD",
+      "personName": "Raj Kumar",
+      "email": "raj@bihar.gov.in",
+      "mobile": "9876543210"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": 1,
+      "user": "Admin User",
+      "action": "Upload",
+      "file": "CM Patna Visit",
+      "date": "2025-01-15 10:30:00",
+      "ip": "192.168.1.1"
+    },
+    {
+      "id": 2,
+      "user": "District Officer",
+      "action": "Search",
+      "file": "District Achievement Report",
+      "date": "2025-01-14 14:20:00",
+      "ip": "192.168.1.2"
+    },
+    {
+      "id": 3,
+      "user": "Block Officer",
+      "action": "Share",
+      "file": "CM Patna Visit",
+      "date": "2025-01-13 09:15:00",
+      "ip": "192.168.1.3"
+    },
+    {
+      "id": 4,
+      "user": "Staff Member",
+      "action": "View",
+      "file": "Tourism Promotion Video",
+      "date": "2025-01-12 16:45:00",
+      "ip": "192.168.1.4"
+    },
+    {
+      "id": 5,
+      "user": "Admin User",
+      "action": "Delete",
+      "file": "Old Report",
+      "date": "2025-01-11 11:00:00",
+      "ip": "192.168.1.1"
+    }
+  ],
+  "statistics": {
+    "totalUploads": 125,
+    "totalSearches": 342,
+    "totalShares": 89,
+    "cloudData": 75,
+    "localData": 25
+  },
+  "topTags": [
+    {"name": "CM Byte", "count": 45},
+    {"name": "Innovation", "count": 32},
+    {"name": "Achievement", "count": 28},
+    {"name": "Success Story", "count": 20},
+    {"name": "Best Practice", "count": 15}
+  ]
+}
+

@@ -1,0 +1,123 @@
+{
+  "en": {
+    "login": {
+      "title": "IPRD ERP System",
+      "subtitle": "Government Content Management System",
+      "guestButton": "Continue as Guest (View All Features)",
+      "username": "Username",
+      "selectRole": "Select Role",
+      "loginButton": "Login",
+      "or": "OR",
+      "features": {
+        "title": "System Features:",
+        "contentManagement": "Content Management",
+        "videoLibrary": "Library",
+        "library": "Library",
+        "searchFilter": "Search & Filter",
+        "reportsAnalytics": "Reports & Analytics"
+      }
+    },
+    "navbar": {
+      "welcome": "Welcome",
+      "logout": "Logout"
+    },
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "masterSettings": "Master Settings",
+      "addContent": "Add Content",
+      "videoLibrary": "Library",
+      "library": "Library",
+      "search": "Search",
+      "share": "Share",
+      "reports": "Reports",
+      "auditLogs": "Audit Logs",
+      "settings": "Settings",
+      "helpCenter": "Help Center"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "totalUploads": "Total Uploads",
+      "totalSearches": "Total Searches",
+      "totalShares": "Total Shares",
+      "cloudVsLocal": "Cloud vs Local Data",
+      "topTags": "Top Tags Used",
+      "recentUploads": "Recent Uploads",
+      "fullAnalytics": "Full Analytics → Coming Soon"
+    },
+    "common": {
+      "select": "Select",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "edit": "Edit",
+      "add": "Add",
+      "search": "Search",
+      "filter": "Filter",
+      "submit": "Submit",
+      "back": "Back",
+      "next": "Next",
+      "close": "Close"
+    }
+  },
+  "hi": {
+    "login": {
+      "title": "IPRD ERP प्रणाली",
+      "subtitle": "सरकारी सामग्री प्रबंधन प्रणाली",
+      "guestButton": "अतिथि के रूप में जारी रखें (सभी सुविधाएं देखें)",
+      "username": "उपयोगकर्ता नाम",
+      "selectRole": "भूमिका चुनें",
+      "loginButton": "लॉगिन",
+      "or": "या",
+      "features": {
+        "title": "सिस्टम सुविधाएं:",
+        "contentManagement": "सामग्री प्रबंधन",
+        "videoLibrary": "लाइब्रेरी",
+        "library": "लाइब्रेरी",
+        "searchFilter": "खोज और फ़िल्टर",
+        "reportsAnalytics": "रिपोर्ट और विश्लेषण"
+      }
+    },
+    "navbar": {
+      "welcome": "स्वागत है",
+      "logout": "लॉगआउट"
+    },
+    "sidebar": {
+      "dashboard": "डैशबोर्ड",
+      "masterSettings": "मास्टर सेटिंग्स",
+      "addContent": "सामग्री जोड़ें",
+      "videoLibrary": "लाइब्रेरी",
+      "library": "लाइब्रेरी",
+      "search": "खोजें",
+      "share": "साझा करें",
+      "reports": "रिपोर्ट",
+      "auditLogs": "ऑडिट लॉग",
+      "settings": "सेटिंग्स",
+      "helpCenter": "सहायता केंद्र"
+    },
+    "dashboard": {
+      "title": "डैशबोर्ड",
+      "totalUploads": "कुल अपलोड",
+      "totalSearches": "कुल खोजें",
+      "totalShares": "कुल साझाकरण",
+      "cloudVsLocal": "क्लाउड बनाम स्थानीय डेटा",
+      "topTags": "शीर्ष टैग",
+      "recentUploads": "हाल की अपलोड",
+      "fullAnalytics": "पूर्ण विश्लेषण → जल्द ही आ रहा है"
+    },
+    "common": {
+      "select": "चुनें",
+      "cancel": "रद्द करें",
+      "save": "सेव करें",
+      "delete": "हटाएं",
+      "edit": "संपादित करें",
+      "add": "जोड़ें",
+      "search": "खोजें",
+      "filter": "फ़िल्टर",
+      "submit": "सबमिट करें",
+      "back": "वापस",
+      "next": "अगला",
+      "close": "बंद करें"
+    }
+  }
+}
+
