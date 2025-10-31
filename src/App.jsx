@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import RoleGuard from './components/RoleGuard';
 import BackgroundLogo from './components/BackgroundLogo';
+import Watermark from './components/Watermark';
 import Toast from './components/Toast';
 
 // Pages
@@ -29,6 +30,7 @@ const Layout = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-background relative">
       <BackgroundLogo />
+      <Watermark />
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col relative z-10 lg:ml-0">
         <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />

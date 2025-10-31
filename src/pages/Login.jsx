@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTranslations } from '../utils/translations';
 import BackgroundLogo from '../components/BackgroundLogo';
+import Watermark from '../components/Watermark';
 import toast from 'react-hot-toast';
 import mockData from '../data/mockData.json';
 
@@ -51,6 +52,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-blue via-blue-600 to-accent flex items-center justify-center px-4 py-8 relative">
       <BackgroundLogo />
+      <Watermark />
       <div className="bg-white rounded-2xl shadow-2xl p-5 lg:p-6 w-full max-w-md lg:max-w-lg transform transition-all hover:scale-105 relative z-10">
         {/* Logo and Header */}
         <div className="text-center mb-4 lg:mb-5 relative">

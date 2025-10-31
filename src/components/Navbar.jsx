@@ -40,8 +40,8 @@ const Navbar = ({ onMenuClick }) => {
                     e.target.style.display = 'none';
                   }}
                 />
-                <span className="text-base lg:text-lg font-bold hidden sm:inline">IPRD ERP System</span>
-                <span className="text-base font-bold sm:hidden">IPRD</span>
+                <span className="text-base lg:text-lg font-bold hidden sm:inline">IPRD ERP | Beta</span>
+                <span className="text-base font-bold sm:hidden">IPRD | Beta</span>
               </Link>
             </div>
             <div className="flex items-center space-x-2 lg:space-x-4">
