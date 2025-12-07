@@ -8,6 +8,7 @@ import RoleGuard from './components/RoleGuard';
 import BackgroundLogo from './components/BackgroundLogo';
 import Watermark from './components/Watermark';
 import Toast from './components/Toast';
+import PWAInstallPrompt from './components/PWAInstallPrompt';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 // Pages
@@ -190,6 +191,7 @@ function App() {
       <AuthProvider>
         <Router>
           <Toast />
+          <PWAInstallPrompt />
           <AppRoutes />
         </Router>
       </AuthProvider>
