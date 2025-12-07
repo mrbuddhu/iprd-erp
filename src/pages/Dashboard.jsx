@@ -110,7 +110,7 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Top Tags */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Top Tags Used</h2>
@@ -163,6 +163,35 @@ const Dashboard = () => {
                 )}
               </tbody>
             </table>
+          </div>
+        </div>
+
+        {/* Recent Activity Widget */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {[
+              { action: 'Upload', item: 'CM Patna Visit Video', user: 'Admin', time: '2 hours ago', icon: '📤' },
+              { action: 'Share', item: 'District Achievement Report', user: 'Dept Admin', time: '5 hours ago', icon: '📤' },
+              { action: 'Tag Added', item: 'Tourism Promotion Video', user: 'Editor', time: '1 day ago', icon: '🏷️' },
+              { action: 'Search', item: 'Innovation projects', user: 'Staff', time: '1 day ago', icon: '🔍' },
+              { action: 'Upload', item: 'Health Campaign Photo', user: 'Block Officer', time: '2 days ago', icon: '📤' },
+              { action: 'Share', item: 'Education Report', user: 'District Officer', time: '2 days ago', icon: '📤' },
+              { action: 'Tag Added', item: 'CM Byte Clip', user: 'Editor', time: '3 days ago', icon: '🏷️' },
+              { action: 'Upload', item: 'Tourism Document', user: 'Staff', time: '3 days ago', icon: '📤' }
+            ].map((activity, idx) => (
+              <div key={idx} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+                <span className="text-xl">{activity.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">
+                    {activity.action}: {activity.item}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    by {activity.user} • {activity.time}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

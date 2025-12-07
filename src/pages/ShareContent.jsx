@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { createAuditLog } from '../utils/auditLog';
+import VideoPlayer from '../components/VideoPlayer';
 import toast from 'react-hot-toast';
 import mockData from '../data/mockData.json';
 
@@ -148,12 +149,27 @@ const ShareContent = () => {
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Share File</h2>
           
           {isClipShare && clipData && (
-            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm font-semibold text-blue-800 mb-2">📹 Video Clip Share</p>
-              <div className="text-xs text-blue-700 space-y-1">
-                <p><strong>Time Range:</strong> {clipData.clipStart} - {clipData.clipEnd}</p>
-                <p><strong>Clip Duration:</strong> {clipData.clipDuration}</p>
-                <p><strong>Tag Type:</strong> {clipData.tagType}</p>
+            <div className="mb-4 space-y-4">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm font-semibold text-blue-800 mb-2">📹 Video Clip Share</p>
+                <div className="text-xs text-blue-700 space-y-1">
+                  <p><strong>Time Range:</strong> {clipData.clipStart} - {clipData.clipEnd}</p>
+                  <p><strong>Clip Duration:</strong> {clipData.clipDuration}</p>
+                  <p><strong>Tag Type:</strong> {clipData.tagType}</p>
+                </div>
+              </div>
+              
+              {/* Clip Preview Mini-Player */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Clip Preview</h4>
+                <div className="max-w-md">
+                  <VideoPlayer
+                    url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    clipStart={clipData.clipStart}
+                    clipEnd={clipData.clipEnd}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Preview of the selected clip time range</p>
               </div>
             </div>
           )}

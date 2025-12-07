@@ -30,7 +30,13 @@ const TagForm = ({ currentTime, onAddTag }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.startTime && formData.endTime && formData.tagType) {
-      onAddTag({ ...formData });
+      onAddTag({ 
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        type: formData.tagType,
+        tagType: formData.tagType, // Keep both for compatibility
+        remarks: formData.remarks
+      });
       setFormData({
         startTime: formatTime(currentTime || 0),
         endTime: '',

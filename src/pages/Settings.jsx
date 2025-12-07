@@ -81,6 +81,30 @@ const Settings = () => {
         {/* Other Settings */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Other Settings</h2>
+          
+          {/* Check Office Network Button */}
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Network Status</h3>
+            <button
+              onClick={() => {
+                const isGovtNetwork = window.location.hostname.includes('gov') || 
+                                     window.location.hostname.includes('localhost') ||
+                                     window.location.hostname.includes('127.0.0.1');
+                if (isGovtNetwork) {
+                  toast.success('✅ Connected to Office Network! You can access local storage files.');
+                } else {
+                  toast.error('❌ Not connected to Office Network. Local storage files are not accessible.');
+                }
+              }}
+              className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+            >
+              🔍 Check Office Network
+            </button>
+            <p className="text-xs text-gray-500 mt-2">
+              Verify if you're connected to the office network to access local storage files.
+            </p>
+          </div>
+          
           <ComingSoon message="Manage Departments / Keys – Coming Soon" />
         </div>
       </div>

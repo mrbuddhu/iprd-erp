@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import VideoPlayer from '../components/VideoPlayer';
 import TagForm from '../components/TagForm';
 import TagList from '../components/TagList';
+import FileTypeIcon from '../components/FileTypeIcon';
 import toast from 'react-hot-toast';
 import mockData from '../data/mockData.json';
+import { generateThumbnails } from '../utils/thumbnailGenerator';
+import { getTagColor } from '../utils/tagColors';
 
 const VideoLibrary = () => {
   const [phase, setPhase] = useState('all'); // raw, editing, output, all
@@ -32,6 +35,15 @@ const VideoLibrary = () => {
   // Get all content (for general library view)
   const allContent = getAllContent();
   const editingVideo = selectedVideo;
+
+  // Generate thumbnails for editing video (must be at top level for hooks)
+  const videoDuration = editingVideo?.metadata?.duration || 300; // Default 5 minutes
+  const thumbnails = useMemo(() => {
+    if (editingVideo && phase === 'editing') {
+      return generateThumbnails(videoDuration, 3);
+    }
+    return [];
+  }, [editingVideo, videoDuration, phase]);
 
   const handleSendToEditing = (video) => {
     setSelectedVideo(video);
@@ -201,6 +213,19 @@ const VideoLibrary = () => {
 
   // Phase II: Editor Processing
   if (phase === 'editing' && editingVideo) {
+    const handleSeekToTime = (seconds) => {
+      setCurrentTime(seconds);
+    };
+
+    const handleTagClick = (tag) => {
+      const timeToSeconds = (timeStr) => {
+        const parts = timeStr.split(':').map(Number);
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+      };
+      const startSeconds = timeToSeconds(tag.startTime || tag.start);
+      setCurrentTime(startSeconds);
+    };
+
     return (
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
@@ -217,38 +242,95 @@ const VideoLibrary = () => {
           </button>
         </div>
 
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Editing: {editingVideo.title || editingVideo.contentName}
-          </h2>
-          <VideoPlayer 
-            url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
-            onTimeUpdate={setCurrentTime}
-          />
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Main Content Area */}
+          <div className="lg:col-span-3">
+            <div className="mb-6">
+              <h2 className="text-xl font-semibold text-gray-700 mb-4">
+                Editing: {editingVideo.title || editingVideo.contentName}
+              </h2>
+              <VideoPlayer 
+                url="https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+                onTimeUpdate={setCurrentTime}
+                tags={tags}
+                onSeek={handleSeekToTime}
+                thumbnails={thumbnails}
+              />
+            </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <TagForm currentTime={currentTime} onAddTag={handleAddTag} />
-          <TagList tags={tags} onDeleteTag={handleDeleteTag} />
-        </div>
+            {/* AI Auto-Transcription Placeholder */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border-2 border-dashed border-gray-300">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">🤖</span>
+                <h3 className="text-lg font-semibold text-gray-800">AI Auto-Transcription</h3>
+                <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full font-medium">
+                  Coming Soon
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">
+                Automatic speech-to-text transcription will be available here. The AI will generate accurate transcripts with timestamps for easy searching and navigation.
+              </p>
+            </div>
 
-        <div className="flex justify-end space-x-4">
-          <button
-            onClick={() => {
-              setPhase('raw');
-              setSelectedVideo(null);
-              setTags([]);
-            }}
-            className="bg-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-400 transition-colors font-semibold"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSaveTags}
-            className="bg-primary-blue text-white px-6 py-3 rounded-xl hover:bg-accent transition-colors font-semibold"
-          >
-            Save & Move to Output
-          </button>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+              <TagForm currentTime={currentTime} onAddTag={handleAddTag} />
+              <TagList tags={tags} onDeleteTag={handleDeleteTag} onTagClick={handleTagClick} />
+            </div>
+
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={() => {
+                  setPhase('raw');
+                  setSelectedVideo(null);
+                  setTags([]);
+                }}
+                className="bg-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-400 transition-colors font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveTags}
+                className="bg-primary-blue text-white px-6 py-3 rounded-xl hover:bg-accent transition-colors font-semibold"
+              >
+                Save & Move to Output
+              </button>
+            </div>
+          </div>
+
+          {/* Tag Navigator Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-xl shadow-sm p-6 sticky top-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Tag Navigator</h3>
+              {tags.length === 0 ? (
+                <p className="text-sm text-gray-500">No tags yet. Add tags to navigate quickly.</p>
+              ) : (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  {tags.map((tag, idx) => {
+                    const tagType = tag.type || tag.tagType;
+                    const colors = tagType === 'CM Byte' ? 'bg-red-100 text-red-800 border-red-300' :
+                                  tagType === 'Innovation' ? 'bg-blue-100 text-blue-800 border-blue-300' :
+                                  tagType === 'Achievement' ? 'bg-green-100 text-green-800 border-green-300' :
+                                  'bg-gray-100 text-gray-800 border-gray-300';
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleTagClick(tag)}
+                        className={`w-full text-left p-3 rounded-lg border ${colors} hover:opacity-80 transition-opacity`}
+                      >
+                        <div className="text-xs font-semibold mb-1">{tagType}</div>
+                        <div className="text-xs opacity-75">
+                          {tag.startTime || tag.start} - {tag.endTime || tag.end}
+                        </div>
+                        {tag.remarks && (
+                          <div className="text-xs opacity-60 mt-1 line-clamp-1">{tag.remarks}</div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -352,12 +434,7 @@ const VideoLibrary = () => {
               <div key={item.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
                 {/* Content Type Icon */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-3xl">
-                    {item.contentType === 'Video' ? '🎬' :
-                     item.contentType === 'Photo' ? '🖼️' :
-                     item.contentType === 'Document' ? '📄' :
-                     item.contentType === 'Report' ? '📊' : '📁'}
-                  </span>
+                  <FileTypeIcon contentType={item.contentType} className="text-3xl" />
                   <div className="flex items-center gap-2">
                     {item.metadata?.isZip && (
                       <span className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">
@@ -402,11 +479,15 @@ const VideoLibrary = () => {
                 {item.tags && item.tags.length > 0 && (
                   <div className="mb-3">
                     <div className="flex flex-wrap gap-1">
-                      {item.tags.slice(0, 2).map((tag, idx) => (
-                        <span key={idx} className="px-2 py-0.5 bg-primary-blue text-white text-xs rounded">
-                          {tag.type || tag}
-                        </span>
-                      ))}
+                      {item.tags.slice(0, 2).map((tag, idx) => {
+                        const tagType = tag.type || tag;
+                        const colors = getTagColor(tagType);
+                        return (
+                          <span key={idx} className={`px-2 py-0.5 ${colors.bg} ${colors.text} text-xs rounded-full border ${colors.border}`}>
+                            {tagType}
+                          </span>
+                        );
+                      })}
                       {item.tags.length > 2 && (
                         <span className="text-xs text-gray-500">+{item.tags.length - 2}</span>
                       )}
@@ -516,11 +597,15 @@ const VideoLibrary = () => {
                 <div className="mb-4">
                   <p className="text-sm font-medium text-gray-700 mb-2">Tags:</p>
                   <div className="flex flex-wrap gap-2">
-                    {video.tags.slice(0, 3).map((tag, idx) => (
-                      <span key={idx} className="px-2 py-1 bg-primary-blue text-white text-xs rounded">
-                        {tag.type}
-                      </span>
-                    ))}
+                    {video.tags.slice(0, 3).map((tag, idx) => {
+                      const tagType = tag.type || tag.tagType;
+                      const colors = getTagColor(tagType);
+                      return (
+                        <span key={idx} className={`px-2 py-1 ${colors.bg} ${colors.text} text-xs rounded-full border ${colors.border}`}>
+                          {tagType}
+                        </span>
+                      );
+                    })}
                   </div>
                 </div>
               )}

@@ -6,6 +6,7 @@ import { isVideoFile, isImageFile, detectFileType, FILE_FORMATS } from '../utils
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
 import mockData from '../data/mockData.json';
+import { generateThumbnails } from '../utils/thumbnailGenerator';
 
 // Helper function to format file size
 const formatFileSize = (bytes) => {
@@ -187,6 +188,11 @@ const AddContent = () => {
       const minutes = Math.floor((metadata.duration % 3600) / 60);
       const seconds = Math.floor(metadata.duration % 60);
       metadata.formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      
+      // Generate thumbnails for videos
+      if (formData.contentType === 'Video') {
+        metadata.thumbnails = generateThumbnails(metadata.duration, 3);
+      }
     }
     
     // Format image dimensions if available
@@ -440,6 +446,25 @@ const AddContent = () => {
               onChange={(e) => handleChange('remarks', e.target.value)}
             />
           </div>
+
+          {/* OCR Extract Text Button for Documents */}
+          {formData.contentType === 'Document' && formData.file && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-semibold text-blue-800 mb-1">📄 OCR Extract Text</h4>
+                  <p className="text-xs text-blue-600">Extract text from scanned documents and images</p>
+                </div>
+                <button
+                  type="button"
+                  disabled
+                  className="px-4 py-2 bg-blue-200 text-blue-800 rounded-lg text-sm font-medium cursor-not-allowed opacity-75"
+                >
+                  Coming Soon
+                </button>
+              </div>
+            </div>
+          )}
 
                  <button
                    type="submit"
