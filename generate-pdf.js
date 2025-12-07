@@ -2,8 +2,8 @@ const { mdToPdf } = require('md-to-pdf');
 const path = require('path');
 
 async function generatePDF() {
-  const mdFile = path.join(__dirname, 'MVP_DEMO_DOCUMENT_SIMPLE.md');
-  const pdfFile = path.join(__dirname, 'IPRD_ERP_MVP_Demo_Document.pdf');
+  const mdFile = path.join(__dirname, 'PRESENTATION_COMPLETE.md');
+  const pdfFile = path.join(__dirname, 'IPRD_ERP_Presentation_Guide.pdf');
 
   console.log('📄 Generating PDF from Markdown...\n');
 
