@@ -8,6 +8,7 @@ import RoleGuard from './components/RoleGuard';
 import BackgroundLogo from './components/BackgroundLogo';
 import Watermark from './components/Watermark';
 import Toast from './components/Toast';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 // Pages
 import Login from './pages/Login';
@@ -64,6 +65,13 @@ const PublicRoute = ({ children }) => {
 };
 
 function AppRoutes() {
+  const { user } = useAuth();
+  
+  // Global keyboard shortcuts
+  useKeyboardShortcuts({
+    disabled: !user // Only enable when logged in
+  });
+
   return (
     <Routes>
       {/* Public Route */}

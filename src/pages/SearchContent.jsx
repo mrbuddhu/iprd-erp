@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SearchFilters from '../components/SearchFilters';
 import ZipViewer from '../components/ZipViewer';
+import BulkActions from '../components/BulkActions';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SkeletonCard from '../components/SkeletonCard';
@@ -14,17 +15,49 @@ const SearchContent = () => {
   const [zipFile, setZipFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedDepartments, setSelectedDepartments] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchPresets, setSearchPresets] = useState([]);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     // Simulate loading
     const timer = setTimeout(() => {
-      const localContent = JSON.parse(localStorage.getItem('iprd_content') || '[]');
-      const allContent = [...mockData.videos, ...localContent];
-      setResults(allContent);
-      setLoading(false);
+      try {
+        const localContent = JSON.parse(localStorage.getItem('iprd_content') || '[]');
+        const allContent = [...mockData.videos, ...localContent];
+        setResults(allContent);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error loading content:', error);
+        toast.error('Error loading content');
+        setLoading(false);
+      }
     }, 300);
     return () => clearTimeout(timer);
   }, []);
+
+  // Load search presets
+  useEffect(() => {
+    try {
+      const presets = JSON.parse(localStorage.getItem('iprd_search_presets') || '[]');
+      setSearchPresets(presets);
+    } catch (error) {
+      console.error('Error loading search presets:', error);
+    }
+  }, []);
+
+  // Pagination
+  const totalPages = Math.ceil(results.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedResults = results.slice(startIndex, endIndex);
+
+  // Reset to page 1 when results change
+  useEffect(() => {
+    setCurrentPage(1);
+    setSelectedItems([]);
+  }, [results.length]);
 
   // Get unique departments from results
   const uniqueDepartments = [...new Set(results.map(item => item.department).filter(Boolean))];
@@ -69,13 +102,50 @@ const SearchContent = () => {
     toast.success('Search results exported to CSV successfully!');
   };
 
+  // HTML escape function to prevent XSS
+  const escapeHtml = (text) => {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+
   const handlePrintPreview = () => {
     if (!selectedContent) return;
+    
+    // Escape all user-provided data to prevent XSS
+    const title = escapeHtml(selectedContent.title || selectedContent.contentName || 'Untitled');
+    const department = escapeHtml(selectedContent.department || 'N/A');
+    const district = escapeHtml(selectedContent.district || 'N/A');
+    const block = escapeHtml(selectedContent.block || 'N/A');
+    const contentType = escapeHtml(selectedContent.contentType || 'N/A');
+    const uploadDate = escapeHtml(selectedContent.uploadDate || selectedContent.date || 'N/A');
+    const remarks = selectedContent.remarks ? escapeHtml(selectedContent.remarks) : '';
+    
+    // Build tags HTML safely
+    let tagsHtml = '';
+    if (selectedContent.tags && selectedContent.tags.length > 0) {
+      const tagsList = selectedContent.tags.map(tag => {
+        const tagType = escapeHtml(tag.type || tag || '');
+        const startTime = escapeHtml(tag.startTime || tag.start || '');
+        const endTime = escapeHtml(tag.endTime || tag.end || '');
+        return `<li>${tagType} (${startTime} - ${endTime})</li>`;
+      }).join('');
+      tagsHtml = `
+        <div class="detail">
+          <span class="label">Tags:</span>
+          <ul>${tagsList}</ul>
+        </div>
+      `;
+    }
+    
+    const remarksHtml = remarks ? `<div class="detail"><span class="label">Remarks:</span> ${remarks}</div>` : '';
+    
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
       <html>
         <head>
-          <title>${selectedContent.title || selectedContent.contentName}</title>
+          <title>${title}</title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
             h1 { color: #333; }
@@ -84,21 +154,14 @@ const SearchContent = () => {
           </style>
         </head>
         <body>
-          <h1>${selectedContent.title || selectedContent.contentName}</h1>
-          <div class="detail"><span class="label">Department:</span> ${selectedContent.department || 'N/A'}</div>
-          <div class="detail"><span class="label">District:</span> ${selectedContent.district || 'N/A'}</div>
-          <div class="detail"><span class="label">Block:</span> ${selectedContent.block || 'N/A'}</div>
-          <div class="detail"><span class="label">Content Type:</span> ${selectedContent.contentType || 'N/A'}</div>
-          <div class="detail"><span class="label">Upload Date:</span> ${selectedContent.uploadDate || selectedContent.date || 'N/A'}</div>
-          ${selectedContent.tags && selectedContent.tags.length > 0 ? `
-            <div class="detail">
-              <span class="label">Tags:</span>
-              <ul>
-                ${selectedContent.tags.map(tag => `<li>${tag.type || tag} (${tag.startTime || tag.start} - ${tag.endTime || tag.end})</li>`).join('')}
-              </ul>
-            </div>
-          ` : ''}
-          ${selectedContent.remarks ? `<div class="detail"><span class="label">Remarks:</span> ${selectedContent.remarks}</div>` : ''}
+          <h1>${title}</h1>
+          <div class="detail"><span class="label">Department:</span> ${department}</div>
+          <div class="detail"><span class="label">District:</span> ${district}</div>
+          <div class="detail"><span class="label">Block:</span> ${block}</div>
+          <div class="detail"><span class="label">Content Type:</span> ${contentType}</div>
+          <div class="detail"><span class="label">Upload Date:</span> ${uploadDate}</div>
+          ${tagsHtml}
+          ${remarksHtml}
         </body>
       </html>
     `);
@@ -182,15 +245,120 @@ const SearchContent = () => {
 
   useEffect(() => {
     // Re-filter when department chips change
-    if (selectedDepartments.length > 0) {
+    try {
       const localContent = JSON.parse(localStorage.getItem('iprd_content') || '[]');
       let filtered = [...mockData.videos, ...localContent];
-      filtered = filtered.filter(item => selectedDepartments.includes(item.department));
+      
+      // Apply department filter if any departments are selected
+      if (selectedDepartments.length > 0) {
+        filtered = filtered.filter(item => selectedDepartments.includes(item.department));
+      }
+      // If no departments selected (cleared filters), show all results
+      
       setResults(filtered);
+    } catch (error) {
+      console.error('Error filtering by department:', error);
+      toast.error('Error applying filters');
     }
   }, [selectedDepartments]);
 
+
+  const handleCloseModal = () => {
+    setSelectedContent(null);
+    setZipFile(null);
+  };
+
+  const handleItemSelect = (itemId) => {
+    setSelectedItems(prev => 
+      prev.includes(itemId) 
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedItems.length === paginatedResults.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(paginatedResults.map(item => item.id));
+    }
+  };
+
+  const handleBulkDelete = (items) => {
+    try {
+      const localContent = JSON.parse(localStorage.getItem('iprd_content') || '[]');
+      const itemIds = items.map(item => item.id);
+      const filtered = localContent.filter(item => !itemIds.includes(item.id));
+      localStorage.setItem('iprd_content', JSON.stringify(filtered));
+      setResults(prev => prev.filter(item => !itemIds.includes(item.id)));
+      toast.success(`Deleted ${items.length} items`);
+    } catch (error) {
+      console.error('Error deleting items:', error);
+      toast.error('Error deleting items');
+    }
+  };
+
+  const handleBulkTag = (items, tagType) => {
+    try {
+      const localContent = JSON.parse(localStorage.getItem('iprd_content') || '[]');
+      const itemIds = items.map(item => item.id);
+      const updated = localContent.map(item => {
+        if (itemIds.includes(item.id)) {
+          const existingTags = item.tags || [];
+          return {
+            ...item,
+            tags: [...existingTags, { type: tagType, startTime: '00:00:00', endTime: '00:00:00' }]
+          };
+        }
+        return item;
+      });
+      localStorage.setItem('iprd_content', JSON.stringify(updated));
+      setResults(prev => prev.map(item => {
+        if (itemIds.includes(item.id)) {
+          const existingTags = item.tags || [];
+          return { ...item, tags: [...existingTags, { type: tagType }] };
+        }
+        return item;
+      }));
+    } catch (error) {
+      console.error('Error tagging items:', error);
+      toast.error('Error tagging items');
+    }
+  };
+
+  const handleSaveSearchPreset = () => {
+    const presetName = prompt('Enter a name for this search preset:');
+    if (presetName && presetName.trim()) {
+      try {
+        const newPreset = {
+          id: Date.now(),
+          name: presetName.trim(),
+          filters: { /* current filters */ },
+          resultCount: results.length,
+          createdAt: new Date().toISOString()
+        };
+        const updated = [...searchPresets, newPreset].slice(-10); // Keep last 10
+        localStorage.setItem('iprd_search_presets', JSON.stringify(updated));
+        setSearchPresets(updated);
+        toast.success('Search preset saved!');
+      } catch (error) {
+        console.error('Error saving preset:', error);
+        toast.error('Error saving preset');
+      }
+    }
+  };
+
+  // Track view count
   const handleContentClick = async (content) => {
+    // Increment view count
+    try {
+      const viewCounts = JSON.parse(localStorage.getItem('iprd_view_counts') || '{}');
+      viewCounts[content.id] = (viewCounts[content.id] || 0) + 1;
+      localStorage.setItem('iprd_view_counts', JSON.stringify(viewCounts));
+    } catch (error) {
+      console.error('Error tracking view:', error);
+    }
+
     const isGovtNetwork = window.location.hostname.includes('gov');
     if (content.source === 'local' && !isGovtNetwork) {
       toast.error('This file is viewable only within office network.');
@@ -203,15 +371,10 @@ const SearchContent = () => {
                   (content.title || content.contentName || '').toLowerCase().endsWith('.zip');
     
     if (isZip) {
-      // For ZIP files, we need the actual file object
-      // Since we can't store File objects in localStorage, we'll show a message
-      // or allow user to re-upload ZIP for viewing
       if (content.metadata?.zipFileList) {
-        // Show ZIP contents from metadata
         setSelectedContent(content);
         setZipFile(null);
       } else {
-        // Try to load from localStorage or prompt for file
         toast.info('ZIP file viewer requires the file. Please re-upload the ZIP file to view/extract contents. Tip: ZIP files can be viewed and extracted when uploaded.', { duration: 5000 });
         setSelectedContent(content);
         setZipFile(null);
@@ -222,16 +385,38 @@ const SearchContent = () => {
     }
   };
 
-  const handleCloseModal = () => {
-    setSelectedContent(null);
-    setZipFile(null);
-  };
-
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Search Content</h1>
       
-      <SearchFilters onFilterChange={handleFilterChange} />
+      <div className="mb-4 flex justify-between items-center flex-wrap gap-4">
+        <SearchFilters onFilterChange={handleFilterChange} />
+        <div className="flex gap-2">
+          {searchPresets.length > 0 && (
+            <select
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              onChange={(e) => {
+                if (e.target.value) {
+                  toast.info('Loading preset...');
+                }
+              }}
+            >
+              <option value="">Saved Searches</option>
+              {searchPresets.map(preset => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.name} ({preset.resultCount} results)
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            onClick={handleSaveSearchPreset}
+            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm"
+          >
+            💾 Save Search
+          </button>
+        </div>
+      </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
@@ -252,6 +437,17 @@ const SearchContent = () => {
               </button>
             )}
           </div>
+
+          {/* Bulk Actions */}
+          {selectedItems.length > 0 && (
+            <BulkActions
+              selectedItems={results.filter(item => selectedItems.includes(item.id))}
+              onBulkDelete={handleBulkDelete}
+              onBulkTag={handleBulkTag}
+              onClearSelection={() => setSelectedItems([])}
+              itemType="items"
+            />
+          )}
 
           {/* Department Filter Chips */}
           {uniqueDepartments.length > 0 && (
@@ -283,18 +479,49 @@ const SearchContent = () => {
             </div>
           )}
 
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selectedItems.length === paginatedResults.length && paginatedResults.length > 0}
+                onChange={handleSelectAll}
+                className="w-4 h-4 text-primary-blue rounded"
+              />
+              <span className="text-sm text-gray-600">Select All</span>
+            </div>
+            <div className="text-sm text-gray-600">
+              Showing {startIndex + 1}-{Math.min(endIndex, results.length)} of {results.length} results
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {results.map((content) => (
+        {paginatedResults.map((content) => {
+          const viewCounts = JSON.parse(localStorage.getItem('iprd_view_counts') || '{}');
+          const viewCount = viewCounts[content.id] || 0;
+          return (
           <div
             key={content.id}
-            onClick={() => handleContentClick(content)}
-            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer"
+            className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
-            <div className="flex items-center gap-3 mb-2">
-              <FileTypeIcon contentType={content.contentType} />
-              <h3 className="text-lg font-semibold text-gray-800 flex-1">
-                {content.title || content.contentName}
-              </h3>
+            <div className="flex items-start gap-3 mb-2">
+              <input
+                type="checkbox"
+                checked={selectedItems.includes(content.id)}
+                onChange={() => handleItemSelect(content.id)}
+                onClick={(e) => e.stopPropagation()}
+                className="mt-1 w-4 h-4 text-primary-blue rounded"
+              />
+              <div 
+                className="flex-1 cursor-pointer"
+                onClick={() => handleContentClick(content)}
+              >
+                <div className="flex items-center gap-3">
+                  <FileTypeIcon contentType={content.contentType} />
+                  <h3 className="text-lg font-semibold text-gray-800 flex-1">
+                    {content.title || content.contentName}
+                  </h3>
+                </div>
+              </div>
             </div>
             <p className="text-sm text-gray-600 mb-2">Department: {content.department}</p>
             
@@ -350,10 +577,36 @@ const SearchContent = () => {
               {content.uploadDate && (
                 <span className="text-xs text-gray-500">{content.uploadDate}</span>
               )}
+              {viewCount > 0 && (
+                <span className="text-xs text-gray-500">👁️ {viewCount} views</span>
+              )}
             </div>
           </div>
-        ))}
+        )})}
           </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-6 flex justify-center items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                ← Previous
+              </button>
+              <span className="px-4 py-2 text-gray-700">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next →
+              </button>
+            </div>
+          )}
         </>
       )}
 

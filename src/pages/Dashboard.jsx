@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import DashboardCard from '../components/DashboardCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SkeletonCard from '../components/SkeletonCard';
+import StorageIndicator from '../components/StorageIndicator';
 import mockData from '../data/mockData.json';
 
 const Dashboard = () => {
@@ -110,7 +111,54 @@ const Dashboard = () => {
         />
       </div>
 
+      {/* Storage Indicator */}
+      <div className="mb-8 max-w-md">
+        <StorageIndicator />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        {/* Popular Content */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">🔥 Popular Content</h2>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {(() => {
+              try {
+                const viewCounts = JSON.parse(localStorage.getItem('iprd_view_counts') || '{}');
+                const localContent = JSON.parse(localStorage.getItem('iprd_content') || '[]');
+                const allContent = [...mockData.videos, ...localContent];
+                const popular = allContent
+                  .map(item => ({
+                    ...item,
+                    views: viewCounts[item.id] || 0
+                  }))
+                  .filter(item => item.views > 0)
+                  .sort((a, b) => b.views - a.views)
+                  .slice(0, 5);
+                
+                return popular.length > 0 ? (
+                  popular.map((item, idx) => (
+                    <div key={item.id} className="flex items-center justify-between p-2 hover:bg-gray-50 rounded">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-gray-800 truncate">
+                          {item.title || item.contentName}
+                        </p>
+                        <p className="text-xs text-gray-500">{item.department}</p>
+                      </div>
+                      <span className="text-sm font-semibold text-primary-blue ml-2">
+                        👁️ {item.views}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 text-sm">No views yet</p>
+                );
+              } catch (error) {
+                return <p className="text-gray-500 text-sm">Error loading popular content</p>;
+              }
+            })()}
+          </div>
+        </div>
+
         {/* Top Tags */}
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Top Tags Used</h2>

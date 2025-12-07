@@ -5,6 +5,7 @@ import { createAuditLog } from '../utils/auditLog';
 import { isVideoFile, isImageFile, detectFileType, FILE_FORMATS } from '../utils/fileFormats';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import DragDropUpload from '../components/DragDropUpload';
 import mockData from '../data/mockData.json';
 import { generateThumbnails } from '../utils/thumbnailGenerator';
 
@@ -38,7 +39,7 @@ const AddContent = () => {
   };
 
   const handleFileChange = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target?.files?.[0] || e; // Support both event and direct file
     if (file) {
       const metadata = {
         fileName: file.name,
@@ -175,72 +176,78 @@ const AddContent = () => {
 
     setUploading(true);
     
-    // Simulate upload delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Save to localStorage with metadata
-    const existingData = JSON.parse(localStorage.getItem('iprd_content') || '[]');
-    const metadata = formData.metadata || {};
-    
-    // Format duration for videos
-    if (metadata.duration) {
-      const hours = Math.floor(metadata.duration / 3600);
-      const minutes = Math.floor((metadata.duration % 3600) / 60);
-      const seconds = Math.floor(metadata.duration % 60);
-      metadata.formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    try {
+      // Simulate upload delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Generate thumbnails for videos
-      if (formData.contentType === 'Video') {
-        metadata.thumbnails = generateThumbnails(metadata.duration, 3);
+      // Save to localStorage with metadata
+      const existingData = JSON.parse(localStorage.getItem('iprd_content') || '[]');
+      const metadata = formData.metadata || {};
+      
+      // Format duration for videos
+      if (metadata.duration) {
+        const hours = Math.floor(metadata.duration / 3600);
+        const minutes = Math.floor((metadata.duration % 3600) / 60);
+        const seconds = Math.floor(metadata.duration % 60);
+        metadata.formattedDuration = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        
+        // Generate thumbnails for videos
+        if (formData.contentType === 'Video') {
+          metadata.thumbnails = generateThumbnails(metadata.duration, 3);
+        }
       }
-    }
-    
-    // Format image dimensions if available
-    if (metadata.width && metadata.height) {
-      metadata.formattedDimensions = `${metadata.width}x${metadata.height}`;
-    }
-    
-    const newContent = {
-      id: Date.now(),
-      ...formData,
-      metadata: {
-        ...metadata,
-        uploadedBy: user?.username || 'Unknown',
-        uploadedAt: new Date().toISOString()
-      },
-      uploadDate: new Date().toISOString().split('T')[0],
-      uploadDateTime: new Date().toISOString(),
-      status: formData.contentType === 'Video' ? 'Raw' : 'Final',
-      fileSizeFormatted: formatFileSize(metadata.fileSize || 0)
-    };
-    existingData.push(newContent);
-    localStorage.setItem('iprd_content', JSON.stringify(existingData));
+      
+      // Format image dimensions if available
+      if (metadata.width && metadata.height) {
+        metadata.formattedDimensions = `${metadata.width}x${metadata.height}`;
+      }
+      
+      const newContent = {
+        id: Date.now(),
+        ...formData,
+        metadata: {
+          ...metadata,
+          uploadedBy: user?.username || 'Unknown',
+          uploadedAt: new Date().toISOString()
+        },
+        uploadDate: new Date().toISOString().split('T')[0],
+        uploadDateTime: new Date().toISOString(),
+        status: formData.contentType === 'Video' ? 'Raw' : 'Final',
+        fileSizeFormatted: formatFileSize(metadata.fileSize || 0)
+      };
+      existingData.push(newContent);
+      localStorage.setItem('iprd_content', JSON.stringify(existingData));
 
-    // Create audit log
-    if (user) {
-      createAuditLog('Upload', formData.contentName, user);
-    }
+      // Create audit log
+      if (user) {
+        createAuditLog('Upload', formData.contentName, user);
+      }
 
-    setUploading(false);
-    toast.success('Content uploaded successfully!');
-    
-    // If video, redirect to library
-    if (formData.contentType === 'Video') {
-      navigate('/video-library');
-    } else {
-      // Reset form
-      setFormData({
-        contentName: '',
-        department: '',
-        personTag: '',
-        district: '',
-        block: '',
-        contentType: '',
-        remarks: '',
-        source: 'cloud',
-        file: null,
-        metadata: {}
-      });
+      setUploading(false);
+      toast.success('Content uploaded successfully!');
+      
+      // If video, redirect to library
+      if (formData.contentType === 'Video') {
+        navigate('/video-library');
+      } else {
+        // Reset form
+        setFormData({
+          contentName: '',
+          department: '',
+          personTag: '',
+          district: '',
+          block: '',
+          contentType: '',
+          remarks: '',
+          source: 'cloud',
+          file: null,
+          metadata: {}
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading content:', error);
+      setUploading(false);
+      toast.error('Error uploading content. Please try again.');
     }
   };
 
@@ -252,12 +259,38 @@ const AddContent = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Upload File *
+              Upload File * <span className="text-xs text-gray-500">(or drag & drop)</span>
             </label>
+            <DragDropUpload
+              onFileSelect={handleFileChange}
+              accept="video/*,image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.odt,.ods,.odp,.csv,.zip,.rar,.7z,.tar,.gz,.bz2,.xz,.pages,.numbers,.key,.md,.tex"
+              maxSize={100 * 1024 * 1024}
+            >
+              <div className="p-8 text-center cursor-pointer">
+                {formData.file ? (
+                  <div className="space-y-2">
+                    <div className="text-4xl">✅</div>
+                    <div className="font-semibold text-gray-700">{formData.metadata?.fileName || 'File selected'}</div>
+                    <div className="text-sm text-gray-500">Click or drag another file to replace</div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="text-4xl">📤</div>
+                    <div className="font-semibold text-gray-700">Drag & drop file here</div>
+                    <div className="text-sm text-gray-500">or click to browse</div>
+                    <div className="text-xs text-gray-400 mt-2">Supports: Videos, Images, Documents, Archives</div>
+                  </div>
+                )}
+              </div>
+            </DragDropUpload>
             <input
               type="file"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-blue"
-              onChange={handleFileChange}
+              className="hidden"
+              onChange={(e) => {
+                if (e.target.files[0]) {
+                  handleFileChange({ target: { files: [e.target.files[0]] } });
+                }
+              }}
               accept="video/*,image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.rtf,.odt,.ods,.odp,.csv,.zip,.rar,.7z,.tar,.gz,.bz2,.xz,.pages,.numbers,.key,.md,.tex"
               required
             />
