@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ComingSoon from '../components/ComingSoon';
+import { useTranslations } from '../utils/translations';
 import toast from 'react-hot-toast';
 import mockData from '../data/mockData.json';
 
 const MasterSettings = () => {
+  const { t } = useTranslations();
   const [activeTab, setActiveTab] = useState('departments');
   const [items, setItems] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -12,10 +14,10 @@ const MasterSettings = () => {
   const [newItemName, setNewItemName] = useState('');
 
   const tabs = [
-    { id: 'departments', label: 'Departments', storageKey: 'iprd_departments' },
-    { id: 'districts', label: 'Districts', storageKey: 'iprd_districts' },
-    { id: 'blocks', label: 'Blocks', storageKey: 'iprd_blocks' },
-    { id: 'roles', label: 'Roles', storageKey: 'iprd_roles' },
+    { id: 'departments', label: t('masterSettings.departments'), storageKey: 'iprd_departments', key: 'departments' },
+    { id: 'districts', label: t('masterSettings.districts'), storageKey: 'iprd_districts', key: 'districts' },
+    { id: 'blocks', label: t('masterSettings.blocks'), storageKey: 'iprd_blocks', key: 'blocks' },
+    { id: 'roles', label: t('masterSettings.roles'), storageKey: 'iprd_roles', key: 'roles' },
   ];
 
   const currentTab = tabs.find(tab => tab.id === activeTab);
@@ -90,8 +92,10 @@ const MasterSettings = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Master Settings</h1>
+    <div className="p-4 lg:p-6">
+      <div className="w-full -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 lg:py-6 bg-white border-b border-gray-200 mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">{t('masterSettings.title')}</h1>
+      </div>
       
       {/* Tabs */}
       <div className="bg-white rounded-xl shadow-sm mb-6">
@@ -120,7 +124,7 @@ const MasterSettings = () => {
             onClick={() => setShowAddModal(true)}
             className="bg-primary-blue text-white px-4 py-2 rounded-lg hover:bg-accent transition-colors"
           >
-            + Add New
+            + {t('masterSettings.addNew', { type: currentTab.label })}
           </button>
         </div>
         <div className="overflow-x-auto">
@@ -128,15 +132,15 @@ const MasterSettings = () => {
             <thead>
               <tr className="border-b border-gray-200">
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-700">S.No</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-700">Name</th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-700">Actions</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-700">{t('masterSettings.name')}</th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-700">{t('common.actions') || 'Actions'}</th>
               </tr>
             </thead>
             <tbody>
               {items.length === 0 ? (
                 <tr>
                   <td colSpan="3" className="py-8 text-center text-gray-500">
-                    No {currentTab.label.toLowerCase()} found. Click "+ Add New" to create one.
+                    {t('masterSettings.noItems', { type: currentTab.label })}
                   </td>
                 </tr>
               ) : (
@@ -149,13 +153,13 @@ const MasterSettings = () => {
                         onClick={() => handleEdit(item, index)}
                         className="text-primary-blue hover:text-accent text-sm font-medium mr-3"
                       >
-                        Edit
+                        {t('masterSettings.edit')}
                       </button>
                       <button 
                         onClick={() => handleDelete(index)}
                         className="text-red-500 hover:text-red-700 text-sm font-medium"
                       >
-                        Delete
+                        {t('masterSettings.delete')}
                       </button>
                     </td>
                   </tr>
@@ -170,11 +174,11 @@ const MasterSettings = () => {
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Add New {currentTab.label.slice(0, -1)}</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('masterSettings.addNew', { type: currentTab.label })}</h3>
             <input
               type="text"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-blue mb-4"
-              placeholder={`Enter ${currentTab.label.slice(0, -1).toLowerCase()} name`}
+              placeholder={t('masterSettings.enterName')}
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAdd()}
@@ -185,7 +189,7 @@ const MasterSettings = () => {
                 onClick={handleAdd}
                 className="flex-1 bg-primary-blue text-white px-4 py-2 rounded-lg hover:bg-accent transition-colors"
               >
-                Add
+                {t('masterSettings.add')}
               </button>
               <button
                 onClick={() => {
@@ -194,7 +198,7 @@ const MasterSettings = () => {
                 }}
                 className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
               >
-                Cancel
+                {t('masterSettings.cancel')}
               </button>
             </div>
           </div>
@@ -205,11 +209,11 @@ const MasterSettings = () => {
       {showEditModal && editingItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-semibold text-gray-800 mb-4">Edit {currentTab.label.slice(0, -1)}</h3>
+            <h3 className="text-xl font-semibold text-gray-800 mb-4">{t('masterSettings.editItem', { type: currentTab.label })}</h3>
             <input
               type="text"
               className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-blue mb-4"
-              placeholder={`Enter ${currentTab.label.slice(0, -1).toLowerCase()} name`}
+              placeholder={t('masterSettings.enterName')}
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleUpdate()}

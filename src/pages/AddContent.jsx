@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { createAuditLog } from '../utils/auditLog';
 import { isVideoFile, isImageFile, detectFileType, FILE_FORMATS } from '../utils/fileFormats';
+import { useTranslations } from '../utils/translations';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
 import DragDropUpload from '../components/DragDropUpload';
@@ -21,6 +22,7 @@ const formatFileSize = (bytes) => {
 const AddContent = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useTranslations();
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     contentName: '',
@@ -252,14 +254,16 @@ const AddContent = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Add Content</h1>
+    <div className="p-4 lg:p-6">
+      <div className="w-full -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 lg:py-6 bg-white border-b border-gray-200 mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">{t('addContent.title')}</h1>
+      </div>
       
       <div className="bg-white rounded-xl shadow-sm p-6 max-w-4xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Upload File * <span className="text-xs text-gray-500">(or drag & drop)</span>
+              {t('addContent.uploadFile')} * <span className="text-xs text-gray-500">({t('addContent.dragDrop')})</span>
             </label>
             <DragDropUpload
               onFileSelect={handleFileChange}
@@ -270,15 +274,15 @@ const AddContent = () => {
                 {formData.file ? (
                   <div className="space-y-2">
                     <div className="text-4xl">✅</div>
-                    <div className="font-semibold text-gray-700">{formData.metadata?.fileName || 'File selected'}</div>
-                    <div className="text-sm text-gray-500">Click or drag another file to replace</div>
+                    <div className="font-semibold text-gray-700">{formData.metadata?.fileName || t('addContent.fileSelected')}</div>
+                    <div className="text-sm text-gray-500">{t('addContent.clickOrDrag')}</div>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <div className="text-4xl">📤</div>
-                    <div className="font-semibold text-gray-700">Drag & drop file here</div>
-                    <div className="text-sm text-gray-500">or click to browse</div>
-                    <div className="text-xs text-gray-400 mt-2">Supports: Videos, Images, Documents, Archives</div>
+                    <div className="font-semibold text-gray-700">{t('addContent.dragDropHere')}</div>
+                    <div className="text-sm text-gray-500">{t('addContent.orClickBrowse')}</div>
+                    <div className="text-xs text-gray-400 mt-2">{t('addContent.supports')}</div>
                   </div>
                 )}
               </div>

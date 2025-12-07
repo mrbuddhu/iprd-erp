@@ -36,8 +36,10 @@ const Layout = ({ children }) => {
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col relative z-10 lg:ml-0">
         <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-        <main className="flex-1 overflow-y-auto relative z-10 p-4 lg:p-6">
-          {children}
+        <main className="flex-1 overflow-y-auto relative z-10">
+          <div className="w-full">
+            {children}
+          </div>
         </main>
         <footer className="bg-white border-t border-gray-200 py-4 px-6 text-center text-xs lg:text-sm text-gray-600 relative z-10">
           SanganakHQ - Innovation & Growth Boutique

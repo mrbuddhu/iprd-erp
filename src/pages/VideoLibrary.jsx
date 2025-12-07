@@ -3,12 +3,14 @@ import VideoPlayer from '../components/VideoPlayer';
 import TagForm from '../components/TagForm';
 import TagList from '../components/TagList';
 import FileTypeIcon from '../components/FileTypeIcon';
+import { useTranslations } from '../utils/translations';
 import toast from 'react-hot-toast';
 import mockData from '../data/mockData.json';
 import { generateThumbnails } from '../utils/thumbnailGenerator';
 import { getTagColor } from '../utils/tagColors';
 
 const VideoLibrary = () => {
+  const { t } = useTranslations();
   const [phase, setPhase] = useState('all'); // raw, editing, output, all
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [currentTime, setCurrentTime] = useState(0);
@@ -75,6 +77,21 @@ const VideoLibrary = () => {
     setTags([]);
   };
 
+  // Helper function to convert time string to seconds
+  const timeToSeconds = (timeStr) => {
+    const parts = timeStr.split(':').map(Number);
+    return parts[0] * 3600 + parts[1] * 60 + parts[2];
+  };
+
+  const handleSeekToTime = (seconds) => {
+    setCurrentTime(seconds);
+  };
+
+  const handleTagClick = (tag) => {
+    const startSeconds = timeToSeconds(tag.startTime || tag.start);
+    setCurrentTime(startSeconds);
+  };
+
   const handleShareClip = (video, tag) => {
     // Navigate to share page with clip information
     const shareData = {
@@ -121,25 +138,27 @@ const VideoLibrary = () => {
   // Phase I: Raw File Upload / Content Library
   if (phase === 'raw') {
     return (
-      <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Library - Raw Videos</h1>
-            <p className="text-gray-600 mt-1">Videos pending editing</p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => setPhase('all')}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              📁 View All Content
-            </button>
-            <button
-              onClick={() => setPhase('output')}
-              className="bg-primary-blue text-white px-4 py-2 rounded-lg hover:bg-accent transition-colors"
-            >
-              View Final Videos
-            </button>
+      <div className="p-4 lg:p-6">
+        <div className="w-full -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 lg:py-6 bg-white border-b border-gray-200 mb-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">{t('videoLibrary.libraryRawVideos')}</h1>
+              <p className="text-gray-600 mt-1">{t('videoLibrary.videosPending')}</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setPhase('all')}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                📁 {t('videoLibrary.viewAllContent')}
+              </button>
+              <button
+                onClick={() => setPhase('output')}
+                className="bg-primary-blue text-white px-4 py-2 rounded-lg hover:bg-accent transition-colors"
+              >
+                {t('videoLibrary.viewFinalVideos')}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -213,19 +232,6 @@ const VideoLibrary = () => {
 
   // Phase II: Editor Processing
   if (phase === 'editing' && editingVideo) {
-    const handleSeekToTime = (seconds) => {
-      setCurrentTime(seconds);
-    };
-
-    const handleTagClick = (tag) => {
-      const timeToSeconds = (timeStr) => {
-        const parts = timeStr.split(':').map(Number);
-        return parts[0] * 3600 + parts[1] * 60 + parts[2];
-      };
-      const startSeconds = timeToSeconds(tag.startTime || tag.start);
-      setCurrentTime(startSeconds);
-    };
-
     return (
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">

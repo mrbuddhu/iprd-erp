@@ -4,10 +4,12 @@ import DashboardCard from '../components/DashboardCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SkeletonCard from '../components/SkeletonCard';
 import StorageIndicator from '../components/StorageIndicator';
+import { useTranslations } from '../utils/translations';
 import mockData from '../data/mockData.json';
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslations();
 
   // Calculate statistics dynamically from localStorage and mockData
   const stats = useMemo(() => {
@@ -84,27 +86,29 @@ const Dashboard = () => {
 
   return (
     <div className="p-4 lg:p-6">
-      <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 mb-4 lg:mb-6">Dashboard</h1>
+      <div className="w-full -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 lg:py-6 bg-white border-b border-gray-200 mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">{t('dashboard.title')}</h1>
+      </div>
       
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <DashboardCard
-          title="Total Uploads"
+          title={t('dashboard.totalUploads')}
           value={stats.totalUploads}
           icon="📁"
         />
         <DashboardCard
-          title="Total Searches"
+          title={t('dashboard.totalSearches')}
           value={stats.totalSearches}
           icon="🔍"
         />
         <DashboardCard
-          title="Total Shares"
+          title={t('dashboard.totalShares')}
           value={stats.totalShares}
           icon="📤"
         />
         <DashboardCard
-          title="Cloud vs Local Data"
+          title={t('dashboard.cloudVsLocal')}
           value={`${stats.cloudData}% / ${stats.localData}%`}
           icon="☁️"
           subtitle={`Cloud: ${stats.cloudData}% | Local: ${stats.localData}%`}
@@ -119,7 +123,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         {/* Popular Content */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">🔥 Popular Content</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">🔥 {t('dashboard.popularContent')}</h2>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {(() => {
               try {
@@ -150,10 +154,10 @@ const Dashboard = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-sm">No views yet</p>
+                  <p className="text-gray-500 text-sm">{t('dashboard.noViewsYet')}</p>
                 );
               } catch (error) {
-                return <p className="text-gray-500 text-sm">Error loading popular content</p>;
+                return <p className="text-gray-500 text-sm">{t('common.error')}</p>;
               }
             })()}
           </div>
@@ -161,7 +165,7 @@ const Dashboard = () => {
 
         {/* Top Tags */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Top Tags Used</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('dashboard.topTags')}</h2>
           <div className="space-y-3">
             {stats.topTags.length > 0 ? (
               stats.topTags.map((tag, index) => (
@@ -176,14 +180,14 @@ const Dashboard = () => {
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-sm">No tags yet</p>
+              <p className="text-gray-500 text-sm">{t('dashboard.noTagsYet')}</p>
             )}
           </div>
         </div>
 
         {/* Recent Uploads */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Uploads</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('dashboard.recentUploads')}</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -205,7 +209,7 @@ const Dashboard = () => {
                 ) : (
                   <tr>
                     <td colSpan="3" className="py-4 text-center text-gray-500 text-sm">
-                      No uploads yet
+                      {t('dashboard.noUploadsYet')}
                     </td>
                   </tr>
                 )}
@@ -216,7 +220,7 @@ const Dashboard = () => {
 
         {/* Recent Activity Widget */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Activity</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('dashboard.recentActivity')}</h2>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {[
               { action: 'Upload', item: 'CM Patna Visit Video', user: 'Admin', time: '2 hours ago', icon: '📤' },
@@ -250,7 +254,7 @@ const Dashboard = () => {
           to="/reports"
           className="bg-primary-blue text-white px-8 py-3 rounded-xl hover:bg-accent transition-colors font-semibold"
         >
-          Full Analytics → Coming Soon
+          {t('dashboard.fullAnalytics')}
         </Link>
       </div>
     </div>

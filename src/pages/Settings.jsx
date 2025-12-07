@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslations } from '../utils/translations';
 import ComingSoon from '../components/ComingSoon';
 
 const Settings = () => {
+  const { t } = useTranslations();
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -73,17 +75,19 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Settings</h1>
+    <div className="p-4 lg:p-6">
+      <div className="w-full -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 lg:py-6 bg-white border-b border-gray-200 mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">{t('settings.title')}</h1>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Change Password */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Change Password</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('settings.changePassword')}</h2>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Current Password
+                {t('settings.currentPassword')}
               </label>
               <input
                 type="password"
@@ -94,7 +98,7 @@ const Settings = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                New Password
+                {t('settings.newPassword')}
               </label>
               <input
                 type="password"
@@ -105,7 +109,7 @@ const Settings = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm New Password
+                {t('settings.confirmNewPassword')}
               </label>
               <input
                 type="password"
@@ -118,37 +122,37 @@ const Settings = () => {
               type="submit"
               className="w-full bg-primary-blue text-white py-2 rounded-xl hover:bg-accent transition-colors font-medium"
             >
-              Change Password
+              {t('settings.changePasswordButton')}
             </button>
           </form>
         </div>
 
         {/* Other Settings */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Other Settings</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('settings.otherSettings')}</h2>
           
           {/* PWA Install Button */}
           {!isInstalled && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Install App</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">{t('settings.installApp')}</h3>
               <button
                 onClick={handleInstallClick}
                 className="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center justify-center gap-2"
               >
-                📱 Install IPRD ERP App
+                {t('settings.installButton')}
               </button>
               <p className="text-xs text-gray-500 mt-2">
                 {isDesktop 
-                  ? 'Install this app for quick desktop access. Works offline and opens in standalone window.'
-                  : 'Install this app on your device for quick access and offline functionality.'}
+                  ? t('settings.installDescription')
+                  : t('settings.installDescriptionMobile')}
               </p>
               {isDesktop && !deferredPrompt && (
                 <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-700">
-                  <strong>Desktop Instructions:</strong>
+                  <strong>{t('settings.desktopInstructions')}</strong>
                   <ul className="mt-1 space-y-1 list-disc list-inside">
-                    <li>Look for install icon (➕) in browser address bar</li>
-                    <li>Or go to browser Menu → "Install IPRD ERP"</li>
-                    <li>Works in Chrome, Edge, and other Chromium browsers</li>
+                    <li>{t('settings.desktopInstructionsList1')}</li>
+                    <li>{t('settings.desktopInstructionsList2')}</li>
+                    <li>{t('settings.desktopInstructionsList3')}</li>
                   </ul>
                 </div>
               )}
@@ -157,7 +161,7 @@ const Settings = () => {
 
           {/* Check Office Network Button */}
           <div className="mb-6">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Network Status</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">{t('settings.networkStatus')}</h3>
             <button
               onClick={() => {
                 const isGovtNetwork = window.location.hostname.includes('gov') || 
@@ -171,10 +175,10 @@ const Settings = () => {
               }}
               className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
             >
-              🔍 Check Office Network
+              {t('settings.checkOfficeNetwork')}
             </button>
             <p className="text-xs text-gray-500 mt-2">
-              Verify if you're connected to the office network to access local storage files.
+              {t('settings.networkDescription')}
             </p>
           </div>
           

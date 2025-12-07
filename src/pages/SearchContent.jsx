@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SearchFilters from '../components/SearchFilters';
 import ZipViewer from '../components/ZipViewer';
 import BulkActions from '../components/BulkActions';
+import { useTranslations } from '../utils/translations';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SkeletonCard from '../components/SkeletonCard';
@@ -10,6 +11,7 @@ import { getTagColor } from '../utils/tagColors';
 import mockData from '../data/mockData.json';
 
 const SearchContent = () => {
+  const { t } = useTranslations();
   const [results, setResults] = useState([]);
   const [selectedContent, setSelectedContent] = useState(null);
   const [zipFile, setZipFile] = useState(null);
@@ -386,8 +388,10 @@ const SearchContent = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Search Content</h1>
+    <div className="p-4 lg:p-6">
+      <div className="w-full -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 lg:py-6 bg-white border-b border-gray-200 mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">{t('searchContent.title')}</h1>
+      </div>
       
       <div className="mb-4 flex justify-between items-center flex-wrap gap-4">
         <SearchFilters onFilterChange={handleFilterChange} />
@@ -401,7 +405,7 @@ const SearchContent = () => {
                 }
               }}
             >
-              <option value="">Saved Searches</option>
+              <option value="">{t('searchContent.savedSearches')}</option>
               {searchPresets.map(preset => (
                 <option key={preset.id} value={preset.id}>
                   {preset.name} ({preset.resultCount} results)
@@ -413,7 +417,7 @@ const SearchContent = () => {
             onClick={handleSaveSearchPreset}
             className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm"
           >
-            💾 Save Search
+            {t('searchContent.saveSearch')}
           </button>
         </div>
       </div>
@@ -426,14 +430,14 @@ const SearchContent = () => {
         <>
           <div className="mb-4 flex justify-between items-center flex-wrap gap-4">
             <p className="text-gray-600">
-              Found {results.length} result{results.length !== 1 ? 's' : ''}
+              {t('searchContent.foundResults', { count: results.length, plural: results.length !== 1 ? 's' : '' })}
             </p>
             {results.length > 0 && (
               <button
                 onClick={handleExportToExcel}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
               >
-                📊 Export to Excel
+                📊 {t('searchContent.exportToExcel')}
               </button>
             )}
           </div>
@@ -452,7 +456,7 @@ const SearchContent = () => {
           {/* Department Filter Chips */}
           {uniqueDepartments.length > 0 && (
             <div className="mb-4 bg-white rounded-xl shadow-sm p-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">Filter by Department:</h3>
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">{t('searchContent.filterByDepartment')}</h3>
               <div className="flex flex-wrap gap-2">
                 {uniqueDepartments.map(dept => (
                   <button
@@ -472,7 +476,7 @@ const SearchContent = () => {
                     onClick={() => setSelectedDepartments([])}
                     className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
                   >
-                    Clear Filters
+                    {t('searchContent.clearFilters')}
                   </button>
                 )}
               </div>
@@ -487,10 +491,10 @@ const SearchContent = () => {
                 onChange={handleSelectAll}
                 className="w-4 h-4 text-primary-blue rounded"
               />
-              <span className="text-sm text-gray-600">Select All</span>
+              <span className="text-sm text-gray-600">{t('searchContent.selectAll')}</span>
             </div>
             <div className="text-sm text-gray-600">
-              Showing {startIndex + 1}-{Math.min(endIndex, results.length)} of {results.length} results
+              {t('searchContent.showing', { start: startIndex + 1, end: Math.min(endIndex, results.length), total: results.length })}
             </div>
           </div>
 
@@ -593,17 +597,17 @@ const SearchContent = () => {
                 disabled={currentPage === 1}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                ← Previous
+                {t('searchContent.previous')}
               </button>
               <span className="px-4 py-2 text-gray-700">
-                Page {currentPage} of {totalPages}
+                {t('searchContent.page', { current: currentPage, total: totalPages })}
               </span>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Next →
+                {t('searchContent.next')}
               </button>
             </div>
           )}

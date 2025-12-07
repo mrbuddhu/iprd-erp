@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { createAuditLog } from '../utils/auditLog';
+import { useTranslations } from '../utils/translations';
 import VideoPlayer from '../components/VideoPlayer';
 import toast from 'react-hot-toast';
 import mockData from '../data/mockData.json';
 
 const ShareContent = () => {
   const { user } = useAuth();
+  const { t } = useTranslations();
   const [formData, setFormData] = useState({
     department: '',
     personName: '',
@@ -140,13 +142,15 @@ const ShareContent = () => {
   };
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Share Content</h1>
+    <div className="p-4 lg:p-6">
+      <div className="w-full -mx-4 lg:-mx-6 px-4 lg:px-6 py-4 lg:py-6 bg-white border-b border-gray-200 mb-6">
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">{t('shareContent.title')}</h1>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Share Form */}
         <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Share File</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">{t('shareContent.shareFile')}</h2>
           
           {isClipShare && clipData && (
             <div className="mb-4 space-y-4">
@@ -177,7 +181,7 @@ const ShareContent = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Department *
+                {t('shareContent.department')} *
               </label>
               <select
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-blue"
@@ -185,7 +189,7 @@ const ShareContent = () => {
                 onChange={(e) => handleChange('department', e.target.value)}
                 required
               >
-                <option value="">Select Department</option>
+                <option value="">{t('shareContent.selectDepartment')}</option>
                 {mockData.departments.map((dept) => (
                   <option key={dept} value={dept}>{dept}</option>
                 ))}
@@ -194,12 +198,12 @@ const ShareContent = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Person Name *
+                {t('shareContent.personName')} *
               </label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                placeholder="Enter person name"
+                placeholder={t('shareContent.enterPersonName')}
                 value={formData.personName}
                 onChange={(e) => handleChange('personName', e.target.value)}
                 required
@@ -208,12 +212,12 @@ const ShareContent = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                File Name / ID *
+                {t('shareContent.fileName')} *
               </label>
               <input
                 type="text"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-blue"
-                placeholder="Enter file name or ID"
+                placeholder={t('shareContent.enterFileName')}
                 value={formData.fileName}
                 onChange={(e) => handleChange('fileName', e.target.value)}
                 required
@@ -222,7 +226,7 @@ const ShareContent = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email *
+                {t('shareContent.email')} *
               </label>
               <input
                 type="email"
@@ -236,7 +240,7 @@ const ShareContent = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Mobile *
+                {t('shareContent.mobile')} *
               </label>
               <input
                 type="tel"
@@ -250,12 +254,12 @@ const ShareContent = () => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Remarks
+                {t('shareContent.remarks')}
               </label>
               <textarea
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-blue"
                 rows="3"
-                placeholder="Enter remarks..."
+                placeholder={t('shareContent.enterRemarks')}
                 value={formData.remarks}
                 onChange={(e) => handleChange('remarks', e.target.value)}
               />
@@ -265,7 +269,7 @@ const ShareContent = () => {
               type="submit"
               className="w-full bg-primary-blue text-white py-3 rounded-xl hover:bg-accent transition-colors font-semibold"
             >
-              Share File
+              {t('shareContent.shareFileButton')}
             </button>
           </form>
         </div>

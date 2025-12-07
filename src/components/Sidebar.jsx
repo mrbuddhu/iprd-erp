@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTranslations } from '../utils/translations';
@@ -7,6 +7,14 @@ const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const { user } = useAuth();
   const { t } = useTranslations();
+  const [collapsed, setCollapsed] = useState(() => {
+    const saved = localStorage.getItem('iprd_sidebar_collapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('iprd_sidebar_collapsed', JSON.stringify(collapsed));
+  }, [collapsed]);
 
   const menuItems = [
     { path: '/dashboard', label: 'sidebar.dashboard', icon: '📊', access: ['all'] },
@@ -46,8 +54,8 @@ const Sidebar = ({ isOpen, onClose }) => {
       {/* Sidebar */}
       <aside className={`
         fixed lg:static inset-y-0 left-0 z-50
-        w-64 bg-white shadow-lg min-h-screen
-        transform transition-transform duration-300 ease-in-out
+        ${collapsed ? 'w-16' : 'w-64'} bg-white shadow-lg min-h-screen
+        transform transition-all duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Mobile Close Button */}
@@ -59,6 +67,19 @@ const Sidebar = ({ isOpen, onClose }) => {
             aria-label="Close menu"
           >
             ×
+          </button>
+        </div>
+
+        {/* Desktop Collapse Button */}
+        <div className="hidden lg:flex items-center justify-between p-4 border-b">
+          {!collapsed && <span className="text-xl font-bold text-primary-blue">IPRD ERP</span>}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="text-gray-600 hover:text-gray-800 text-xl p-1 rounded hover:bg-gray-100"
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={collapsed ? 'Expand' : 'Collapse'}
+          >
+            {collapsed ? '→' : '←'}
           </button>
         </div>
         
@@ -74,14 +95,15 @@ const Sidebar = ({ isOpen, onClose }) => {
                     onClose();
                   }
                 }}
-                className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors ${
+                className={`flex items-center ${collapsed ? 'justify-center' : 'space-x-3'} px-4 py-3 rounded-xl transition-colors ${
                   isActive(item.path)
                     ? 'bg-primary-blue text-white'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
+                title={collapsed ? t(item.label) : ''}
               >
                 <span className="text-xl">{item.icon}</span>
-                <span className="font-medium">{t(item.label)}</span>
+                {!collapsed && <span className="font-medium">{t(item.label)}</span>}
               </Link>
             ))}
           </nav>
