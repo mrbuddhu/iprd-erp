@@ -1,6 +1,17 @@
 # IPRD ERP System
 
+## Enterprise-Grade Government Content Management Platform
+
 A complete, production-grade MVP web-based centralized content management and digital archive system for government departments (IPRD). This system allows uploading, managing, searching, tagging, and sharing of official content (videos, photos, documents, and reports) with role-based access, hybrid storage access, and audit trails.
+
+---
+
+## ⚠️ Important Notice
+
+**This project is proprietary and confidential.**
+This is the exclusive intellectual property of mrbuddhu. **This project should not be copied, distributed, reproduced, or used in any form without explicit written permission.** All rights reserved.
+
+---
 
 ## 🌟 Features
 
@@ -204,9 +215,12 @@ The application is configured for Hostinger hosting:
 
 This is a government project. For contributions or queries, please contact the project maintainer.
 
-## 📄 License
+## 📄 License & Confidentiality
 
-This project is proprietary software for government use.
+This project and all associated materials are confidential and proprietary.
+© 2026 mrbuddhu. All Rights Reserved.
+
+No part of this project may be reproduced, distributed, or transmitted in any form or by any means without the prior written permission of mrbuddhu.
 
 ## 👨‍💻 Developed By
 
@@ -215,3 +229,7 @@ SanganakHQ - Innovation & Growth Boutique
 ---
 
 **Note**: This system uses localStorage for data persistence. For production deployment with a backend, data should be migrated to a proper database.
+
+---
+
+**This is a high-value enterprise project with an estimated development cost exceeding $40,000 USD.**
